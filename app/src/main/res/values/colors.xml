@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+
+    <color name="light_gray">#8C8C8C</color>
+    <color name="colorPrimary">#304FFE</color>
+    <color name="sunshine_yellow">#FFEB3B</color>
+    <color name="mustard_yellow">#FFD600</color>
+
+    <color name="coral">#FF8A65</color>
+    <!-- Gold/Yellow Theme -->
+    <color name="gold_primary">#FFD700</color>  <!-- Primary gold -->
+    <color name="gold_dark">#FFC600</color>     <!-- Dark gold -->
+    <color name="gold_light">#FFF4B1</color>    <!-- Light gold (ripples) -->
+
+    <!-- Peach Accents -->
+    <color name="soft_peach">#FFCCBC</color>   <!-- Secondary -->
+    <color name="peach_dark">#FFAB91</color>    <!-- Dark peach -->
+
+    <!-- Neutrals -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#1A1A1A</color>
+    <color name="gray_light">#F5F5F5</color>
+
+    <!-- Backgrounds -->
+    <color name="bg_gradient_start">#FFF9E6</color>  <!-- Light yellow -->
+    <color name="bg_gradient_end">#FFFFFF</color>    <!-- White -->
+    <!-- Dark background colors -->
+    <color name="dark_background">#121212</color>
+    <color name="dark_surface">#1E1E1E</color>
+
+    <!-- Night Theme Colors -->
+    <color name="dark_bg">#121212</color>
+    <color name="dark_input_bg">#1E1E1E</color>
+    <color name="dark_yellow">#FFC107</color>  <!-- Amber -->
+    <color name="dark_mustard">#FFA000</color>
+    <color name="dark_peach">#FFAB91</color>
+    <color name="dark_coral">#FF7043</color>
+    <!-- Adjusted peach colors for dark mode -->
+    <color name="peach_soft">#FFAB91</color>
+    <color name="peach_light">#FFCCBC</color>
+
+
+    <color name="text_primary">#E0E0E0</color>
+    <color name="text_secondary">#A0A0A0</color>
+
+
+</resources>
