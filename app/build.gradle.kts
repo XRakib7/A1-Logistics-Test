@@ -13,9 +13,9 @@ android {
         minSdk = 28
         compileSdk = 35
         targetSdk = 35
-        versionCode = 3
-        versionName = "1.1.0.3"
-//gh release create v1.1.0.2 "app/release/A1 Logistics.apk" --title "Version 1.1.0.2" --notes "Initial release with basic functionality"
+        versionCode = 4
+        versionName = "1.1.0.4"
+//gh release create v1.1.0.4 "app\release\app-release.apk" --title "Version 1.1.0.4" --notes "Initial release with basic functionality"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
