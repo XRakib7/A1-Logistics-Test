@@ -57,6 +57,7 @@
 
             <!-- Phone Number -->
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/phoneInputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -69,6 +70,19 @@
                     android:layout_height="wrap_content"
                     android:hint="Phone Number"
                     android:inputType="phone"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/verifyPhoneButton"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Verify"
+                    app:icon="@drawable/ic_verify"
+                    app:iconTint="@color/dark_mustard"
+                    android:layout_gravity="end"
+                    android:layout_marginEnd="8dp"
+                    android:visibility="gone"
+                    />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Pickup Location -->

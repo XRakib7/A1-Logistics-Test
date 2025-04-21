@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.google.gms.google.services)
+    id("com.google.firebase.appdistribution")
 }
 
 android {
@@ -9,11 +10,12 @@ android {
 
     defaultConfig {
         applicationId = "com.example.a1logisticstest1"
-        minSdk = 26
+        minSdk = 28
+        compileSdk = 35
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.1.0.1"
-
+        versionCode = 3
+        versionName = "1.1.0.3"
+//gh release create v1.1.0.2 "app/release/A1 Logistics.apk" --title "Version 1.1.0.2" --notes "Initial release with basic functionality"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -39,11 +41,15 @@ dependencies {
     implementation ("com.firebaseui:firebase-ui-firestore:8.0.2")
     implementation ("androidx.recyclerview:recyclerview:1.3.2")
     implementation ("androidx.media:media:1.6.0")
-    implementation("com.google.android.gms:play-services-base:18.2.0") // Usually required
+    implementation("com.google.android.gms:play-services-base:18.6.0") // Usually required
     implementation("androidx.appcompat:appcompat:1.6.1") // or the latest version
     implementation ("com.airbnb.android:lottie:6.1.0") // Latest stable version
-
-
+    implementation("com.google.android.gms:play-services-auth:21.3.0")
+    // https://mvnrepository.com/artifact/com.google.android.gms/play-services-auth-api-phone
+    implementation("com.google.android.gms:play-services-auth-api-phone:18.2.0")
+    implementation ("com.google.android.material:material:1.6.0")// or higher
+    implementation ("com.google.firebase:firebase-storage:20.3.0")  // For APK hosting
+    implementation ("com.google.firebase:firebase-appdistribution:16.0.0-beta10")  // For update checks
 
     implementation(libs.appcompat)
     implementation(libs.material)
@@ -55,6 +61,7 @@ dependencies {
     implementation(libs.googleid)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.messaging)
+    implementation(libs.firebase.functions)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

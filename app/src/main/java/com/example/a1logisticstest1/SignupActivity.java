@@ -3,6 +3,7 @@ package com.example.a1logisticstest1;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Patterns;
@@ -16,6 +17,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -26,7 +28,6 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
-
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -39,7 +40,9 @@ public class SignupActivity extends AppCompatActivity {
     private static final String CONFIG_COLLECTION = "Config";
     private static final String ACCESS_CODES_DOC = "AccessCodes";
     private static final String ADMIN_CODE_FIELD = "adminCode";
-
+    private static final int PHONE_VERIFICATION_REQUEST = 1001;
+    private boolean isPhoneVerified = false;
+    private String verifiedPhoneNumber = "";
     // Firebase instances
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
@@ -48,6 +51,7 @@ public class SignupActivity extends AppCompatActivity {
     private TextInputEditText businessNameEditText, phoneEditText,
             pickupLocationEditText, emailEditText, passwordEditText;
     private TextInputLayout pickupLocationLayout, nameInputLayout;
+    private MaterialButton verifyPhoneButton;
     private Button signupButton;
     private TextView signupTitle, loginRedirectText;
 
@@ -105,6 +109,7 @@ public class SignupActivity extends AppCompatActivity {
     private void initializeViews() {
         businessNameEditText = findViewById(R.id.businessNameEditText);
         phoneEditText = findViewById(R.id.phoneEditText);
+        verifyPhoneButton = findViewById(R.id.verifyPhoneButton);
         pickupLocationEditText = findViewById(R.id.pickupLocationEditText);
         emailEditText = findViewById(R.id.emailEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
@@ -130,6 +135,21 @@ public class SignupActivity extends AppCompatActivity {
         loginRedirectText.setOnClickListener(v -> {
             startActivity(new Intent(SignupActivity.this, LoginActivity.class));
             finish();
+        });
+        verifyPhoneButton.setOnClickListener(v -> {
+            String phone = phoneEditText.getText().toString().trim();
+            if (phone.isEmpty()) {
+                phoneEditText.setError("Enter phone number first");
+                return;
+            }
+            if (!Patterns.PHONE.matcher(phone).matches()) {
+                phoneEditText.setError("Enter valid phone number");
+                return;
+            }
+
+            Intent intent = new Intent(SignupActivity.this, PhoneVerificationActivity.class);
+            intent.putExtra("phoneNumber", phone);
+            startActivityForResult(intent, PHONE_VERIFICATION_REQUEST);
         });
     }
 
@@ -158,7 +178,24 @@ public class SignupActivity extends AppCompatActivity {
             signupTitle.setText("Merchant Sign Up");
         }
     }
-
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PHONE_VERIFICATION_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                isPhoneVerified = true;
+                verifiedPhoneNumber = data.getStringExtra("phoneNumber");
+                phoneEditText.setText(verifiedPhoneNumber);
+                phoneEditText.setEnabled(false);
+                verifyPhoneButton.setText("Verified");
+                verifyPhoneButton.setEnabled(false);
+                verifyPhoneButton.setIconResource(R.drawable.ic_verified);
+                verifyPhoneButton.setIconTint(ColorStateList.valueOf(getResources().getColor(R.color.green)));
+                Snackbar.make(findViewById(android.R.id.content),
+                        "Phone number verified", Snackbar.LENGTH_SHORT).show();
+            }
+        }
+    }
     private void attemptSignup() {
         // Get input values
         String name = businessNameEditText.getText().toString().trim();
@@ -219,7 +256,10 @@ public class SignupActivity extends AppCompatActivity {
         } else if (!Patterns.PHONE.matcher(phone).matches()) {
             phoneEditText.setError("Enter a valid phone number");
             valid = false;
-        }
+        }/* else if (!isPhoneVerified || !phone.equals(verifiedPhoneNumber)) {
+            phoneEditText.setError("Phone number must be verified");
+            valid = false;
+        }*/
 
         if (!isAdminSignup && pickupLocation.isEmpty()) {
             pickupLocationEditText.setError("Pickup location is required");
