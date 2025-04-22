@@ -22,7 +22,6 @@ android {
     //git push origin main
     //git tag -a v1.1.0.5 -m "Release 1.1.0.5"
     //git push origin v1.1.0.5
-    //git push origin v1.1.0.5
     // gh release create v1.1.0.5 "app\release\app-release.apk" --title "Version 1.1.0.5" --notes "Initial release with basic functionality"
 
     buildTypes {
