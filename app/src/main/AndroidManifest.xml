@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
     <queries>
         <intent>
             <action android:name="android.intent.action.VIEW" />
+
             <data android:mimeType="application/vnd.android.package-archive" />
         </intent>
     </queries>
@@ -28,6 +30,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.A1Logistics"
         tools:targetApi="31">
+        <activity
+            android:name=".UpdateActivity"
+            android:exported="false" />
         <activity
             android:name=".SplashActivity"
             android:exported="true">

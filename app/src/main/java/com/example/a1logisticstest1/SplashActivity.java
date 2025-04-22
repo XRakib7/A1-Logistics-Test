@@ -3,22 +3,16 @@ package com.example.a1logisticstest1;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class SplashActivity extends AppCompatActivity implements UpdateChecker.UpdateListener {
-    private UIBlocker uiBlocker;
-    private UpdateChecker updateChecker; // Declare the variable here
+    private UpdateChecker updateChecker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        uiBlocker = new UIBlocker(this);
-        uiBlocker.blockUI("Checking for updates...");
-
-        // Initialize the UpdateChecker here
         updateChecker = new UpdateChecker(this, this);
         updateChecker.checkForUpdates();
     }
@@ -27,30 +21,33 @@ public class SplashActivity extends AppCompatActivity implements UpdateChecker.U
     protected void onDestroy() {
         super.onDestroy();
         if (updateChecker != null) {
-            updateChecker.cleanup(); // Now this will work
+            updateChecker.cleanup();
         }
     }
 
     @Override
     public void onUpdateAvailable(String newVersion, String changelog) {
-        uiBlocker.showSuccess("New version " + newVersion + " available. Downloading...", () -> {
-            proceedToLogin();
-        });
+        // Start UpdateActivity when update is available
+        Intent intent = new Intent(this, UpdateActivity.class);
+        intent.putExtra("newVersion", newVersion);
+        intent.putExtra("changelog", changelog);
+        startActivity(intent);
+        finish();
     }
 
     @Override
     public void onUpdateDownloading(int progress) {
-        // Optional: Update progress if you implement a progress bar
+        // Not used here, handled in UpdateActivity
     }
 
     @Override
     public void onUpdateDownloaded() {
-        Toast.makeText(this, "Update downloaded. Installing...", Toast.LENGTH_LONG).show();
+        // Not used here, handled in UpdateActivity
     }
 
     @Override
     public void onError(String message) {
-        uiBlocker.showError("Update check failed: " + message);
+        // Show error and proceed (you might want to handle this differently)
         new Handler().postDelayed(() -> proceedToLogin(), 2000);
     }
 

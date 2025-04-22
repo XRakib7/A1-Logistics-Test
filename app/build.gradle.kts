@@ -13,16 +13,16 @@ android {
         minSdk = 28
         compileSdk = 35
         targetSdk = 35
-        versionCode = 5
-        versionName = "1.1.0.5"
+        versionCode = 6
+        versionName = "1.1.0.6"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     //git add .
-    //git commit -m "Prepare release 1.1.0.5"
+    //git commit -m "Prepare release 1.1.0.6"
     //git push origin main
-    //git tag -a v1.1.0.5 -m "Release 1.1.0.5"
-    //git push origin v1.1.0.5
-    // gh release create v1.1.0.5 "app\release\app-release.apk" --title "Version 1.1.0.5" --notes "Initial release with basic functionality"
+    //git tag -a v1.1.0.6 -m "Release 1.1.0.6"
+    //git push origin v1.1.0.6
+    // gh release create v1.1.0.6 "app\release\app-release.apk" --title "Version 1.1.0.6" --notes "Initial release with basic functionality"
 
     buildTypes {
         release {

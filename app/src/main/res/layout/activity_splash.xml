@@ -34,7 +34,7 @@
         android:layout_marginTop="20dp"
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
-        app:lottie_rawRes="@raw/empty_loading"/>
+        app:lottie_rawRes="@raw/world_loop"/>
 
     <!-- App name with nice typography -->
     <TextView

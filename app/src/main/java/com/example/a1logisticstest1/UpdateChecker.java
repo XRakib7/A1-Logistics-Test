@@ -39,6 +39,8 @@ public class UpdateChecker {
         this.listener = listener;
     }
 
+    // Only showing the modified parts of UpdateChecker.java
+
     public void checkForUpdates() {
         try {
             PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
@@ -54,13 +56,18 @@ public class UpdateChecker {
                                 int latestVersion = ((Long) data.get("version_code")).intValue();
                                 String changelog = (String) data.get("changelog");
                                 String apkUrl = (String) data.get("apk_url");
+                                boolean isMandatory = data.containsKey("is_mandatory") && (boolean) data.get("is_mandatory");
 
                                 if (latestVersion > currentVersion) {
-                                    listener.onUpdateAvailable(
-                                            (String) data.get("version_name"),
-                                            changelog
-                                    );
-                                    downloadUpdate(apkUrl);
+                                    if (isMandatory) {
+                                        listener.onUpdateAvailable(
+                                                (String) data.get("version_name"),
+                                                changelog
+                                        );
+                                    } else {
+                                        // Optional update - proceed to app
+                                        listener.onNoUpdateAvailable();
+                                    }
                                 } else {
                                     listener.onNoUpdateAvailable();
                                 }
