@@ -34,7 +34,7 @@
         android:layout_marginTop="20dp"
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
-        app:lottie_rawRes="@raw/loading"/>
+        app:lottie_rawRes="@raw/empty_loading"/>
 
     <!-- App name with nice typography -->
     <TextView
@@ -44,7 +44,7 @@
         android:layout_above="@id/logo"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="30dp"
-        android:text="1Logistics"
+        android:text="A1 Logistics"
         android:textColor="@color/gold_dark"
         android:textSize="36sp"
         android:textStyle="bold"
@@ -57,12 +57,12 @@
         android:layout_below="@id/loading_animation"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
-        android:text="Sweet deliveries made easy"
+        android:text="Delivering Happiness"
         android:textColor="@color/gold_primary"
         android:textSize="16sp"
        />
 
-    <!-- Floating bees for extra dopamine -->
+    <!-- Floating bees for extra dopamine
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/bee1"
         android:layout_width="60dp"
@@ -83,6 +83,6 @@
         android:layout_margin="40dp"
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
-        app:lottie_rawRes="@raw/arrieved_animaton"/>
+        app:lottie_rawRes="@raw/arrieved_animaton"/>  -->
 
 </RelativeLayout>
