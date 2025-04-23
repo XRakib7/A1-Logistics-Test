@@ -16,7 +16,7 @@ A **modern logistics management Android app** built from scratch to streamline p
 
 | Splash Screen | Login | Merchant Dashboard | Status History |
 |---|---|---|---|
-| ![Splash](screenshots/splash.png) | ![Login](screenshots/login.png) | ![Dashboard](screenshots/dashboard.png) | ![History](screenshots/history.png) |
+| ![Splash](https://drive.google.com/file/d/14RMPM1uQNFdUUfj_LuzvmMXB5WocVDm6/view?usp=drive_link) | ![Login](screenshots/login.png) | ![Dashboard](screenshots/dashboard.png) | ![History](screenshots/history.png) |
 
 ---
 
