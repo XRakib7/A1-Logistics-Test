@@ -118,8 +118,6 @@
                 android:inputType="textCapWords"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-
-
         <Button
             android:id="@+id/submitButton"
             android:layout_width="match_parent"

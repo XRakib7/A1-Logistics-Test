@@ -62,6 +62,18 @@
         android:textSize="16sp"
        />
 
+    <TextView
+        android:id="@+id/status_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/loading_animation"
+        android:layout_marginTop="100dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="50dp"
+        android:textColor="@color/white"
+        android:textSize="16sp"/>
+
     <!-- Floating bees for extra dopamine
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/bee1"

@@ -30,12 +30,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.A1Logistics"
         tools:targetApi="31">
-        <activity
-            android:name=".UpdateActivity"
-            android:exported="false" />
+
         <activity
             android:name=".SplashActivity"
             android:exported="true">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -74,12 +73,10 @@
             android:name=".AdminDashboardActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginActivity"
-            android:exported="false">
-
-        </activity>
-        <activity
             android:name=".SignupActivity"
+            android:exported="false" />
+        <activity
+            android:name=".LoginActivity"
             android:exported="false" />
         <activity
             android:name="com.google.firebase.auth.internal.GenericIdpActivity"
@@ -89,16 +86,6 @@
         <meta-data
             android:name="firebase_auth_auto_verify"
             android:value="false" />
-
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.provider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths" />
-        </provider>
     </application>
 
 </manifest>
