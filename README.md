@@ -14,9 +14,9 @@ A **modern logistics management Android app** built from scratch to streamline p
 
 ## 📸 Screenshots
 
-| Splash Screen | Login | Merchant Dashboard | Packages Details |
-|---|---|---|---|
-| ![Splash](https://github.com/XRakib7/A1-Logistics-Test/blob/main/A1%20Logistics%20Screenshots/Screenshot_20250424-020146.png) | ![Login](https://github.com/XRakib7/A1-Logistics-Test/blob/main/A1%20Logistics%20Screenshots/Screenshot_20250424-020150.png) | ![Dashboard](https://github.com/XRakib7/A1-Logistics-Test/blob/main/A1%20Logistics%20Screenshots/Screenshot_20250424-020350.png) | ![Package](https://github.com/XRakib7/A1-Logistics-Test/blob/main/A1%20Logistics%20Screenshots/Screenshot_20250424-020503.png) |
+| Splash Screen | Login | Merchant Dashboard | Packages Details | Status History |
+|---|---|---|---|---|
+| ![Splash](https://github.com/XRakib7/A1-Logistics-Test/blob/main/A1%20Logistics%20Screenshots/Screenshot_20250424-020146.png) | ![Login](https://github.com/XRakib7/A1-Logistics-Test/blob/main/A1%20Logistics%20Screenshots/Screenshot_20250424-020150.png) | ![Dashboard](https://github.com/XRakib7/A1-Logistics-Test/blob/main/A1%20Logistics%20Screenshots/Screenshot_20250424-020350.png) | ![Package](https://github.com/XRakib7/A1-Logistics-Test/blob/main/A1%20Logistics%20Screenshots/Screenshot_20250424-020503.png) | ![History](https://github.com/XRakib7/A1-Logistics-Test/blob/main/A1%20Logistics%20Screenshots/Screenshot_20250424-021715.png) |
 
 ---
 
