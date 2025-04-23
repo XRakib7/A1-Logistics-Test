@@ -1,46 +1,32 @@
-# <img src="https://via.placeholder.com/40" width="30" height="30"> A1 Logistics - Android Package Management System  
+# A1 Logistics :truck:  
 
-![Banner](https://via.placeholder.com/1200x400) *(Replace with a header image)*  
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)  
+[![Android](https://img.shields.io/badge/Android-6.0%2B-brightgreen)](https://developer.android.com)  
 
-## 🔥 Key Features  
-✅ **Role-Based Dashboards**  
-   - **Admins** (`A001`, `A002`), **Merchants** (`M001`, `M002`)  
-   - Unique package IDs: `A1-M001-0001`, `A1-M001-0002`  
+A modern Android logistics app for efficient shipment tracking and route optimization. Built to simplify fleet management for drivers and administrators.  
 
-✅ **Real-Time Tracking**  
-   - Status updates (Pending → Shipped → Delivered)  
-   - Chronological history with timestamps  
+<p align="center">  
+  <img src="screenshots/demo.gif" alt="A1 Logistics Demo" width="300"/>  
+</p>  
 
-✅ **Advanced Filters**  
-   - Filter by status, date, merchant, or combined queries  
+## Key Features :star2:  
+- **Role-based authentication** (Driver/Admin)  
+- **Real-time GPS tracking** with Google Maps integration  
+- **Route optimization** using distance/time algorithms  
+- **Document scanner** for shipment barcodes/invoices  
+- **Push notifications** for delivery updates  
+- **Offline mode** for remote areas with sync on reconnection  
 
-✅ **Data Export**  
-   - Download Excel reports (single/bulk packages)  
+## Tech Stack :wrench:  
+- **Frontend**: Kotlin, Jetpack Compose  
+- **Backend**: Firebase (Auth, Realtime DB, Cloud Messaging)  
+- **Libraries**:  
+  - `Retrofit` for REST API calls  
+  - `WorkManager` for background sync  
+  - `ZXing` for barcode scanning  
+  - `Room` for local caching  
 
-✅ **Secure Auth**  
-   - Hidden admin signup (restricted access)  
-
----
-
-## 📸 Screenshots  
-| Splash Screen | Admin Dashboard | Merchant View |  
-|--------------|----------------|----------------|  
-| <img src="https://via.placeholder.com/300" width="200"> | <img src="https://via.placeholder.com/300" width="200"> | <img src="https://via.placeholder.com/300" width="200"> |  
-
-| Package Details | Status Timeline | Excel Export |  
-|----------------|----------------|--------------|  
-| <img src="https://via.placeholder.com/300" width="200"> | <img src="https://via.placeholder.com/300" width="200"> | <img src="https://via.placeholder.com/300" width="200"> |  
-
----
-
-## 🛠️ Tech Stack  
-- **Min SDK**: Android 8.0 (API 26)  
-- **Libraries**: Jetpack Components, Retrofit, Room, Lottie  
-- **Backend**: Firebase/FastAPI *(specify yours)*  
-
----
-
-## 🚀 Setup  
+## Installation :arrow_down:  
 1. Clone the repo:  
-   ```bash
-   git clone https://github.com/your-username/A1-Logistics.git
+   ```bash  
+   git clone https://github.com/your-username/A1-Logistics.git  
