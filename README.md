@@ -16,7 +16,7 @@ A **modern logistics management Android app** built from scratch to streamline p
 
 | Splash Screen | Login | Merchant Dashboard | Status History |
 |---|---|---|---|
-| ![Splash](https://drive.google.com/file/d/14RMPM1uQNFdUUfj_LuzvmMXB5WocVDm6/view?usp=drive_link) | ![Login](screenshots/login.png) | ![Dashboard](screenshots/dashboard.png) | ![History](screenshots/history.png) |
+| ![Splash](https://github.com/XRakib7/A1-Logistics-Test/blob/main/A1%20Logistics%20Screenshots/Screenshot_20250424-020146.png) | ![Login](https://github.com/XRakib7/A1-Logistics-Test/blob/main/A1%20Logistics%20Screenshots/Screenshot_20250424-020150.png) | ![Dashboard](https://github.com/XRakib7/A1-Logistics-Test/blob/main/A1%20Logistics%20Screenshots/Screenshot_20250424-020350.png) | ![History](https://github.com/XRakib7/A1-Logistics-Test/blob/main/A1%20Logistics%20Screenshots/Screenshot_20250424-020503.png) |
 
 ---
 
