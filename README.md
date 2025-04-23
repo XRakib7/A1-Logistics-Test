@@ -1,32 +1,66 @@
-# A1 Logistics :truck:  
+# 🚚 A1 Logistics – Android App (Open Source)
 
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)  
-[![Android](https://img.shields.io/badge/Android-6.0%2B-brightgreen)](https://developer.android.com)  
+[![Android](https://img.shields.io/badge/Android-8.0%2B-brightgreen)](https://developer.android.com)  
+[![Firebase](https://img.shields.io/badge/Firebase-integrated-orange)](https://firebase.google.com)  
 
-A modern Android logistics app for efficient shipment tracking and route optimization. Built to simplify fleet management for drivers and administrators.  
+A **modern logistics management Android app** built from scratch to streamline parcel tracking and fleet operations for delivery businesses. A1 Logistics is **feature-rich**, **secure**, and **optimized for performance**. Designed for Bangladeshi eCommerce logistics but adaptable for global use cases.
 
 <p align="center">  
   <img src="screenshots/demo.gif" alt="A1 Logistics Demo" width="300"/>  
-</p>  
+</p>
 
-## Key Features :star2:  
-- **Role-based authentication** (Driver/Admin)  
-- **Real-time GPS tracking** with Google Maps integration  
-- **Route optimization** using distance/time algorithms  
-- **Document scanner** for shipment barcodes/invoices  
-- **Push notifications** for delivery updates  
-- **Offline mode** for remote areas with sync on reconnection  
+---
 
-## Tech Stack :wrench:  
-- **Frontend**: Kotlin, Jetpack Compose  
-- **Backend**: Firebase (Auth, Realtime DB, Cloud Messaging)  
-- **Libraries**:  
-  - `Retrofit` for REST API calls  
-  - `WorkManager` for background sync  
-  - `ZXing` for barcode scanning  
-  - `Room` for local caching  
+## 📸 Screenshots
 
-## Installation :arrow_down:  
-1. Clone the repo:  
-   ```bash  
-   git clone https://github.com/your-username/A1-Logistics.git  
+| Splash Screen | Login | Merchant Dashboard | Status History |
+|---|---|---|---|
+| ![Splash](screenshots/splash.png) | ![Login](screenshots/login.png) | ![Dashboard](screenshots/dashboard.png) | ![History](screenshots/history.png) |
+
+---
+
+## ✨ Key Features
+
+### 🧑‍💼 Role-Based Access
+- **Admin Dashboard**: Full control, analytics, and system management
+- **Merchant Dashboard**: Parcel management, tracking, and filtering
+- **Secure Authentication**: Role-based (Admin, Merchant), hidden admin signup
+
+### 📦 Package Management
+- **Unique Package IDs**: Format – `A1-M001-0001`, `A1-M001-0002`, etc.
+- **User ID System**:
+  - Merchants: `M001`, `M002`, …
+  - Admins: `A001`, `A002`, …
+- **Status Tracking**: Real-time updates with full **status history** in **chronological order**
+- **Advanced Filters**: Filter parcels by status, date, or last update
+- **Excel Export**: Download single or bulk package data
+
+### 📱 App UX/UI
+- Clean, **modern UI** with **smooth animations**
+- Fast and responsive design with **minimal load times**
+- **Splash screen**, custom-designed login/signup pages
+
+---
+
+## 🛠 Tech Stack
+
+- **Language**: Java (w/ Gradle Kotlin DSL)
+- **Backend**: Firebase (Authentication, Firestore, Storage)
+- **Excel Export**: Apache POI
+- **Minimum SDK**: Android 8 (API 26)
+
+### 🔌 External Libraries
+- `Firebase SDK` – Auth, Firestore
+- `Apache POI` – Excel export
+- `Material Design Components` – UI styling
+
+---
+
+## 🚀 Installation Guide
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/xrakib7/a1-logistics.git
+cd a1-logistics
