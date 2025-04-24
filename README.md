@@ -1,6 +1,6 @@
 # 🚚 A1 Logistics – Android App (Open Source)
 
-[![GitHub license](https://github.com/XRakib7/A1-Logistics-Test/blob/main/Licences)](LICENSE)  
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/XRakib7/A1-Logistics-Test/blob/main/Licences)
 
 ## License
 
