@@ -6,7 +6,7 @@
 
 This project is licensed for **personal and non-commercial use only**. If you'd like to use it for business or commercial purposes, please [contact me](email :xrakib1024@gmail.com).
 
-Full license: [LICENSE](./LICENSE)
+Full license: [LICENSE](https://github.com/XRakib7/A1-Logistics-Test/blob/main/Licences)
 
 
 [![Android](https://img.shields.io/badge/Android-8.0%2B-brightgreen)](https://developer.android.com)  
