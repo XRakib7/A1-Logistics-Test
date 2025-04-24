@@ -1,6 +1,14 @@
 # 🚚 A1 Logistics – Android App (Open Source)
 
-[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)  
+[![GitHub license](https://github.com/XRakib7/A1-Logistics-Test/blob/main/Licences)](LICENSE)  
+
+## License
+
+This project is licensed for **personal and non-commercial use only**. If you'd like to use it for business or commercial purposes, please [contact me](email :xrakib1024@gmail.com).
+
+Full license: [LICENSE](./LICENSE)
+
+
 [![Android](https://img.shields.io/badge/Android-8.0%2B-brightgreen)](https://developer.android.com)  
 [![Firebase](https://img.shields.io/badge/Firebase-integrated-orange)](https://firebase.google.com)  
 
