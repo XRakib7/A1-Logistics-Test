@@ -40,7 +40,13 @@ import java.util.Locale;
 import java.util.Map;
 import android.Manifest;
 import com.example.a1logisticstest1.UIBlocker;
-
+/*
+ * This file is part of [A1 Logistics 2025]
+ * Copyright (c) [RAKIB]
+ *
+ * Licensed for personal, non-commercial use only.
+ * Full license available at: [https://github.com/XRakib7/A1-Logistics-Test/blob/main/Licences]
+ */
 public class LoginActivity extends AppCompatActivity {
     private static final String PREFS_NAME = "A1LogisticsPrefs";
     private static final String USER_KEY = "currentUser";
