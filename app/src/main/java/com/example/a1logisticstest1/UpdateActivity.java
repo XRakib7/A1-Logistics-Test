@@ -1,86 +1,148 @@
 package com.example.a1logisticstest1;
 
-import android.app.ProgressDialog;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+
+import com.google.android.material.card.MaterialCardView;
+
 import java.io.File;
+import java.util.Locale;
 
 public class UpdateActivity extends AppCompatActivity implements SplashActivity.DownloadCallback {
-
-    private String apkPathOrUrl;
-    private boolean isDownloaded;
-    private String apkFileName;
-    private long apkFileSize;
-    private ProgressDialog progressDialog;
+    private ProgressBar progressBar;
+    private ProgressBar circularProgress;
+    private Button downloadButton;
+    private Button installButton;
+    private TextView statusText;
+    private TextView progressText;
+    private TextView releaseNotesText;
+    private MaterialCardView updateCard;
+    private String downloadUrl;
+    private String expectedChecksum;
+    private File downloadedApk;
+    private boolean isMandatory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update);
 
-        apkPathOrUrl = getIntent().getStringExtra("apk_path_or_url");
-        isDownloaded = getIntent().getBooleanExtra("is_downloaded", false);
-        apkFileName = getIntent().getStringExtra("apk_name");
-        apkFileSize = getIntent().getLongExtra("apk_size", 0);
+        // Initialize views
+        progressBar = findViewById(R.id.progressBar);
+        circularProgress = findViewById(R.id.circularProgress);
+        downloadButton = findViewById(R.id.downloadButton);
+        installButton = findViewById(R.id.installButton);
+        statusText = findViewById(R.id.statusText);
+        progressText = findViewById(R.id.progressText);
+        releaseNotesText = findViewById(R.id.releaseNotesText);
+        updateCard = findViewById(R.id.updateCard);
 
-        TextView updateText = findViewById(R.id.update_text);
-        Button updateButton = findViewById(R.id.update_button);
+        // Get intent extras
+        downloadUrl = getIntent().getStringExtra("downloadUrl");
+        expectedChecksum = getIntent().getStringExtra("checksum");
+        isMandatory = getIntent().getBooleanExtra("isMandatory", false);
+        String releaseNotes = getIntent().getStringExtra("releaseNotes");
 
-        if (isDownloaded) {
-            updateText.setText("An update is ready to install");
-            updateButton.setText("Install Now");
+        // Setup UI
+        setupUI(releaseNotes);
+
+        // Set click listeners
+        downloadButton.setOnClickListener(v -> startDownload());
+        installButton.setOnClickListener(v -> {
+            if (downloadedApk != null && SplashActivity.verifyApkChecksum(downloadedApk, expectedChecksum)) {
+                SplashActivity.installApk(downloadedApk);
+            } else {
+                statusText.setText("APK verification failed. Please download again.");
+                downloadButton.setEnabled(true);
+                installButton.setEnabled(false);
+            }
+        });
+
+        // For mandatory updates, disable back button
+        if (isMandatory) {
+            // Optional: You can also finish all previous activities
+        }
+    }
+
+    private void setupUI(String releaseNotes) {
+        // Customize based on mandatory/optional update
+        if (isMandatory) {
+            updateCard.setCardBackgroundColor(ContextCompat.getColor(this, R.color.green));
+            downloadButton.setText("Download Now");
+            findViewById(R.id.cancelButton).setVisibility(View.GONE);
         } else {
-            updateText.setText("A new version is available. Please download and install.");
-            updateButton.setText("Download Update");
+            updateCard.setCardBackgroundColor(ContextCompat.getColor(this, R.color.optional_update));
+            downloadButton.setText("Download Update");
+            findViewById(R.id.cancelButton).setVisibility(View.VISIBLE);
+            findViewById(R.id.cancelButton).setOnClickListener(v -> finish());
         }
 
-        updateButton.setOnClickListener(v -> {
-            if (isDownloaded) {
-                File apkFile = new File(apkPathOrUrl);
-                SplashActivity.installApk(apkFile, this);
-            } else {
-                downloadUpdate();
-            }
-        });
+        releaseNotesText.setText(releaseNotes != null ? releaseNotes : "No release notes available");
+        installButton.setEnabled(false);
+        progressBar.setVisibility(View.GONE);
+        circularProgress.setVisibility(View.GONE);
+        progressText.setVisibility(View.GONE);
     }
 
-    private void downloadUpdate() {
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Downloading update...");
-        progressDialog.setCancelable(false);
-        progressDialog.show();
-
-        SplashActivity.downloadApk(apkPathOrUrl, apkFileName, apkFileSize, this, this);
+    private void startDownload() {
+        downloadButton.setEnabled(false);
+        progressBar.setVisibility(View.VISIBLE);
+        circularProgress.setVisibility(View.VISIBLE);
+        progressText.setVisibility(View.VISIBLE);
+        statusText.setText("Downloading update...");
+        SplashActivity.downloadApk(downloadUrl, this);
     }
 
     @Override
-    public void onSuccess(File file) {
-        runOnUiThread(() -> {
-            if (progressDialog != null && progressDialog.isShowing()) {
-                progressDialog.dismiss();
-            }
-            isDownloaded = true;
-            apkPathOrUrl = file.getAbsolutePath();
-
-            Button updateButton = findViewById(R.id.update_button);
-            updateButton.setText("Install Now");
-            TextView updateText = findViewById(R.id.update_text);
-            updateText.setText("Update downloaded. Ready to install.");
-        });
+    public void onDownloadProgress(int progress) {
+        progressBar.setProgress(progress);
+        circularProgress.setProgress(progress);
+        progressText.setText(String.format(Locale.getDefault(), "%d%%", progress));
     }
 
     @Override
-    public void onError(String error) {
-        runOnUiThread(() -> {
-            if (progressDialog != null && progressDialog.isShowing()) {
-                progressDialog.dismiss();
-            }
-            Toast.makeText(this, "Download failed: " + error, Toast.LENGTH_LONG).show();
-        });
+    public void onDownloadComplete(File apkFile) {
+        downloadedApk = apkFile;
+        progressBar.setVisibility(View.GONE);
+        circularProgress.setVisibility(View.GONE);
+        statusText.setText("Download complete!");
+        progressText.setText("Verifying...");
+
+        // Verify checksum in background
+        new Thread(() -> {
+            boolean verified = SplashActivity.verifyApkChecksum(apkFile, expectedChecksum);
+            runOnUiThread(() -> {
+                if (verified) {
+                    progressText.setVisibility(View.GONE);
+                    installButton.setEnabled(true);
+                } else {
+                    statusText.setText("APK verification failed");
+                    progressText.setText("Please try again");
+                    downloadButton.setEnabled(true);
+                }
+            });
+        }).start();
+    }
+
+    @Override
+    public void onDownloadFailed(String error) {
+        progressBar.setVisibility(View.GONE);
+        circularProgress.setVisibility(View.GONE);
+        progressText.setVisibility(View.GONE);
+        statusText.setText("Download failed: " + error);
+        downloadButton.setEnabled(true);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!isMandatory) {
+            super.onBackPressed();
+        }
+        // For mandatory updates, don't allow back press
     }
 }

@@ -44,9 +44,16 @@
     <color name="peach_soft">#FFAB91</color>
     <color name="peach_light">#FFCCBC</color>
 
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
 
-    <color name="text_primary">#E0E0E0</color>
-    <color name="text_secondary">#A0A0A0</color>
+    <!-- Update screen colors -->
+    <color name="mandatory_update">#E53935</color>
+    <color name="optional_update">#3F51B5</color>
+
+    <!-- Text colors -->
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
 
 
 </resources>

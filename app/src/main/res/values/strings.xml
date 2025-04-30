@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">A1 Logistics</string>
+    <string name="new_update_available">New Update Available</string>
+    <string name="update_description">A new version is available. Please update to continue.</string>
+    <string name="download_update">Download Update</string>
+    <string name="install_update">Install Now</string>
+    <string name="not_now">Not Now</string>
+    <string name="error_occurred">Error Occurred</string>
+    <string name="retry">Retry</string>
+    <string name="update_icon">Update Icon</string>
+    <string name="error_icon">Error Icon</string>
 </resources>
