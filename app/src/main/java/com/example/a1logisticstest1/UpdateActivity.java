@@ -1,6 +1,8 @@
 package com.example.a1logisticstest1;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -11,19 +13,20 @@ import androidx.core.content.ContextCompat;
 import com.google.android.material.card.MaterialCardView;
 
 import java.io.File;
-import java.util.Locale;
 
 public class UpdateActivity extends AppCompatActivity implements SplashActivity.DownloadCallback {
     private ProgressBar progressBar;
     private ProgressBar circularProgress;
     private Button downloadButton;
+    private Button btn_settings;
     private Button installButton;
     private TextView statusText;
     private TextView progressText;
+    private TextView instalinstruction;
     private TextView releaseNotesText;
+    private TextView downloadStatsText;
     private MaterialCardView updateCard;
     private String downloadUrl;
-    private String expectedChecksum;
     private File downloadedApk;
     private boolean isMandatory;
 
@@ -32,51 +35,46 @@ public class UpdateActivity extends AppCompatActivity implements SplashActivity.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update);
 
-        // Initialize views
         progressBar = findViewById(R.id.progressBar);
         circularProgress = findViewById(R.id.circularProgress);
         downloadButton = findViewById(R.id.downloadButton);
+        btn_settings = findViewById(R.id.btn_settings);
         installButton = findViewById(R.id.installButton);
         statusText = findViewById(R.id.statusText);
         progressText = findViewById(R.id.progressText);
         releaseNotesText = findViewById(R.id.releaseNotesText);
+        downloadStatsText = findViewById(R.id.downloadStatsText);
         updateCard = findViewById(R.id.updateCard);
+        instalinstruction = findViewById(R.id.instalinstruction);
 
-        // Get intent extras
         downloadUrl = getIntent().getStringExtra("downloadUrl");
-        expectedChecksum = getIntent().getStringExtra("checksum");
         isMandatory = getIntent().getBooleanExtra("isMandatory", false);
         String releaseNotes = getIntent().getStringExtra("releaseNotes");
 
-        // Setup UI
         setupUI(releaseNotes);
 
-        // Set click listeners
         downloadButton.setOnClickListener(v -> startDownload());
+        btn_settings.setOnClickListener(v -> startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS)));
         installButton.setOnClickListener(v -> {
-            if (downloadedApk != null && SplashActivity.verifyApkChecksum(downloadedApk, expectedChecksum)) {
-                SplashActivity.installApk(downloadedApk);
-            } else {
-                statusText.setText("APK verification failed. Please download again.");
-                downloadButton.setEnabled(true);
-                installButton.setEnabled(false);
-            }
+            SplashActivity.installApk(downloadedApk);
+
         });
 
-        // For mandatory updates, disable back button
-        if (isMandatory) {
-            // Optional: You can also finish all previous activities
+        // Check if update file already exists
+        downloadedApk = new File(getExternalFilesDir(null), "update.apk");
+        if (downloadedApk.exists()) {
+            onDownloadComplete(downloadedApk);
         }
     }
 
     private void setupUI(String releaseNotes) {
-        // Customize based on mandatory/optional update
         if (isMandatory) {
-            updateCard.setCardBackgroundColor(ContextCompat.getColor(this, R.color.green));
+            updateCard.setCardBackgroundColor(ContextCompat.getColor(this, R.color.white));
             downloadButton.setText("Download Now");
-            findViewById(R.id.cancelButton).setVisibility(View.GONE);
+            findViewById(R.id.cancelButton).setVisibility(View.VISIBLE);
+            findViewById(R.id.cancelButton).setOnClickListener(v -> finish());
         } else {
-            updateCard.setCardBackgroundColor(ContextCompat.getColor(this, R.color.optional_update));
+            updateCard.setCardBackgroundColor(ContextCompat.getColor(this, R.color.white));
             downloadButton.setText("Download Update");
             findViewById(R.id.cancelButton).setVisibility(View.VISIBLE);
             findViewById(R.id.cancelButton).setOnClickListener(v -> finish());
@@ -87,6 +85,7 @@ public class UpdateActivity extends AppCompatActivity implements SplashActivity.
         progressBar.setVisibility(View.GONE);
         circularProgress.setVisibility(View.GONE);
         progressText.setVisibility(View.GONE);
+        downloadStatsText.setVisibility(View.GONE);
     }
 
     private void startDownload() {
@@ -94,15 +93,31 @@ public class UpdateActivity extends AppCompatActivity implements SplashActivity.
         progressBar.setVisibility(View.VISIBLE);
         circularProgress.setVisibility(View.VISIBLE);
         progressText.setVisibility(View.VISIBLE);
+        downloadButton.setVisibility(View.GONE);
+        downloadStatsText.setVisibility(View.VISIBLE);
         statusText.setText("Downloading update...");
         SplashActivity.downloadApk(downloadUrl, this);
     }
 
     @Override
-    public void onDownloadProgress(int progress) {
+    public void onDownloadProgress(int progress, long downloadedBytes, long totalBytes, double speed) {
         progressBar.setProgress(progress);
         circularProgress.setProgress(progress);
-        progressText.setText(String.format(Locale.getDefault(), "%d%%", progress));
+        progressText.setText(String.format("%d%%", progress));
+
+        // Format file size
+        String sizeInfo;
+        if (totalBytes > 0) {
+            sizeInfo = formatFileSize(downloadedBytes) + " / " + formatFileSize(totalBytes);
+        } else {
+            sizeInfo = formatFileSize(downloadedBytes);
+        }
+
+        // Format speed
+        String speedInfo = formatSpeed(speed);
+
+        downloadStatsText.setText(String.format("%s • %s/s", sizeInfo, speedInfo));
+        installButton.setVisibility(View.GONE);
     }
 
     @Override
@@ -111,22 +126,11 @@ public class UpdateActivity extends AppCompatActivity implements SplashActivity.
         progressBar.setVisibility(View.GONE);
         circularProgress.setVisibility(View.GONE);
         statusText.setText("Download complete!");
-        progressText.setText("Verifying...");
-
-        // Verify checksum in background
-        new Thread(() -> {
-            boolean verified = SplashActivity.verifyApkChecksum(apkFile, expectedChecksum);
-            runOnUiThread(() -> {
-                if (verified) {
-                    progressText.setVisibility(View.GONE);
-                    installButton.setEnabled(true);
-                } else {
-                    statusText.setText("APK verification failed");
-                    progressText.setText("Please try again");
-                    downloadButton.setEnabled(true);
-                }
-            });
-        }).start();
+        progressText.setText("Ready to install");
+        downloadStatsText.setText(formatFileSize(apkFile.length())); // Show final size
+        installButton.setEnabled(true);
+        installButton.setVisibility(View.VISIBLE);
+        instalinstruction.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -134,8 +138,12 @@ public class UpdateActivity extends AppCompatActivity implements SplashActivity.
         progressBar.setVisibility(View.GONE);
         circularProgress.setVisibility(View.GONE);
         progressText.setVisibility(View.GONE);
-        statusText.setText("Download failed: " + error);
+        downloadStatsText.setVisibility(View.GONE);
+        statusText.setText("Download failed: Please turn your internet ON");
         downloadButton.setEnabled(true);
+        instalinstruction.setVisibility(View.GONE);
+        installButton.setVisibility(View.GONE);
+        btn_settings.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -143,6 +151,28 @@ public class UpdateActivity extends AppCompatActivity implements SplashActivity.
         if (!isMandatory) {
             super.onBackPressed();
         }
-        // For mandatory updates, don't allow back press
+        // Block back button for mandatory updates
+    }
+
+    // Helper method to format file size
+    private String formatFileSize(long bytes) {
+        if (bytes < 1024) {
+            return bytes + " B";
+        } else if (bytes < 1024 * 1024) {
+            return String.format("%.1f KB", bytes / 1024.0);
+        } else {
+            return String.format("%.1f MB", bytes / (1024.0 * 1024.0));
+        }
+    }
+
+    // Helper method to format speed
+    private String formatSpeed(double bytesPerSecond) {
+        if (bytesPerSecond < 1024) {
+            return String.format("%.0f B/s", bytesPerSecond);
+        } else if (bytesPerSecond < 1024 * 1024) {
+            return String.format("%.1f KB/s", bytesPerSecond / 1024.0);
+        } else {
+            return String.format("%.1f MB/s", bytesPerSecond / (1024.0 * 1024.0));
+        }
     }
 }

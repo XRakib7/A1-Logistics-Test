@@ -16,6 +16,10 @@
         android:scaleType="centerCrop"/>
 
     <!-- Main logo with bounce animation -->
+    <RelativeLayout
+        android:id="@+id/main_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <ImageView
         android:id="@+id/logo"
         android:layout_width="200dp"
@@ -37,18 +41,14 @@
         app:lottie_rawRes="@raw/world_loop"/>
 
     <!-- App name with nice typography -->
-    <TextView
-        android:id="@+id/app_name"
+    <ImageView
+        android:id="@+id/name_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/logo"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="30dp"
-        android:text="A1 Logistics"
-        android:textColor="@color/gold_dark"
-        android:textSize="36sp"
-        android:textStyle="bold"
-      />
+        android:src="@drawable/a1namelogo"/>
 
     <!-- Version/subtitle text -->
     <TextView
@@ -97,4 +97,80 @@
         app:lottie_loop="true"
         app:lottie_rawRes="@raw/arrieved_animaton"/>  -->
 
+    </RelativeLayout>
+    <!-- Error container (hidden by default) -->
+    <RelativeLayout
+        android:id="@+id/error_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:background="@drawable/bg_gradient_premium"
+        android:padding="40dp">
+
+        <ImageView
+            android:id="@+id/error_icon"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="80dp"
+            android:src="@drawable/no_internet"
+            app:tint="@color/gold_primary"/>
+
+        <TextView
+            android:id="@+id/error_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/error_icon"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            android:gravity="center"
+            android:text="No Internet Connection"
+            android:textColor="@color/dark_mustard"
+            android:textSize="20sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/error_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/error_message"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:text="Please check your connection and try again"
+            android:textColor="@color/dark_mustard"
+            android:textSize="16sp"/>
+
+        <Button
+            android:id="@+id/btn_retry"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/error_description"
+            android:layout_marginTop="40dp"
+            android:backgroundTint="@color/gold_primary"
+            android:text="Try Again"
+            android:textColor="@color/white"/>
+
+        <Button
+            android:id="@+id/btn_settings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/btn_retry"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="@color/gold_dark"
+            android:text="Open Network Settings"
+            android:textColor="@color/white"/>
+
+        <Button
+            android:id="@+id/btn_exit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/btn_settings"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="@color/colorAccent"
+            android:text="Exit App"
+            android:textColor="@color/gold_primary"/>
+    </RelativeLayout>
+
 </RelativeLayout>
+
+

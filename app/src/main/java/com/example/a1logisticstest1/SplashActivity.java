@@ -7,11 +7,17 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -21,8 +27,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.security.MessageDigest;
-import java.util.Locale;
 
 public class SplashActivity extends AppCompatActivity {
     private static final String TAG = "SplashActivity";
@@ -33,10 +37,13 @@ public class SplashActivity extends AppCompatActivity {
 
     private FirebaseFirestore db;
     private long startTime;
-    private File downloadedApkFile;
     private static SplashActivity instance;
     private int retryCount = 0;
-
+    private RelativeLayout mainContent;
+    private RelativeLayout errorContainer;
+    private LottieAnimationView loadingAnimation;
+    private Button btnRetry, btnSettings, btnExit;
+    private TextView errorMessage, errorDescription;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,14 +51,58 @@ public class SplashActivity extends AppCompatActivity {
         instance = this;
         startTime = System.currentTimeMillis();
 
-        // Check network before proceeding
-        if (!isNetworkAvailable()) {
-            showNetworkErrorAndRetry();
-            return;
-        }
+        mainContent = findViewById(R.id.main_content);
+        errorContainer = findViewById(R.id.error_container);
+        loadingAnimation = findViewById(R.id.loading_animation);
+        btnRetry = findViewById(R.id.btn_retry);
+        btnSettings = findViewById(R.id.btn_settings);
+        btnExit = findViewById(R.id.btn_exit);
+        errorMessage = findViewById(R.id.error_message);
+        errorDescription = findViewById(R.id.error_description);
+
+        instance = this;
+        startTime = System.currentTimeMillis();
+
+        // Set up button listeners
+        btnRetry.setOnClickListener(v -> checkNetworkAndProceed());
+        btnSettings.setOnClickListener(v -> openNetworkSettings());
+        btnExit.setOnClickListener(v -> finishAffinity());
+
+        checkNetworkAndProceed();
 
         db = FirebaseFirestore.getInstance();
         checkForUpdates();
+    }
+    private void checkNetworkAndProceed() {
+        if (isNetworkAvailable()) {
+            // Show main content and hide error layout
+            mainContent.setVisibility(View.VISIBLE);
+            errorContainer.setVisibility(View.GONE);
+            loadingAnimation.playAnimation();
+
+            db = FirebaseFirestore.getInstance();
+            checkForUpdates();
+        } else {
+            showNetworkError();
+            // Reset retry count when network is unavailable
+            retryCount = 0;
+        }
+    }
+
+    private void showNetworkError() {
+        // Hide main content and show error layout
+        mainContent.setVisibility(View.GONE);
+        errorContainer.setVisibility(View.VISIBLE);
+        loadingAnimation.pauseAnimation();
+
+        // Update error messages
+        errorMessage.setText(R.string.network_error_title);
+        errorDescription.setText(R.string.network_error_description);
+    }
+
+    private void openNetworkSettings() {
+        Intent intent = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
+        startActivity(intent);
     }
 
     private boolean isNetworkAvailable() {
@@ -59,18 +110,6 @@ public class SplashActivity extends AppCompatActivity {
                 (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-    }
-
-    private void showNetworkErrorAndRetry() {
-        Toast.makeText(this, "No internet connection", Toast.LENGTH_LONG).show();
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            if (retryCount < MAX_RETRY_COUNT) {
-                retryCount++;
-                checkForUpdates();
-            } else {
-                proceedToErrorActivity("Network unavailable after multiple retries");
-            }
-        }, 3000);
     }
 
     private void checkForUpdates() {
@@ -97,16 +136,11 @@ public class SplashActivity extends AppCompatActivity {
             String downloadUrl = document.getString("downloadUrl");
             boolean forceUpdate = Boolean.TRUE.equals(document.getBoolean("forceUpdate"));
             String releaseNotes = document.getString("releaseNotes");
-            String checksum = document.getString("checksum");
             int currentVersionCode = getPackageManager()
                     .getPackageInfo(getPackageName(), 0).versionCode;
 
             if (latestVersionCode > currentVersionCode) {
-                if (forceUpdate) {
-                    proceedToUpdateActivity(downloadUrl, releaseNotes, checksum, true);
-                } else {
-                    proceedToUpdateActivity(downloadUrl, releaseNotes, checksum, false);
-                }
+                proceedToUpdateActivity(downloadUrl, releaseNotes, forceUpdate);
             } else {
                 proceedAfterMinimumDuration(this::proceedToLogin);
             }
@@ -121,7 +155,12 @@ public class SplashActivity extends AppCompatActivity {
             retryCount++;
             new Handler(Looper.getMainLooper()).postDelayed(this::checkForUpdates, 2000);
         } else {
-            proceedAfterMinimumDuration(this::proceedToLogin);
+            // Only proceed if we have network, otherwise show error
+            if (isNetworkAvailable()) {
+                proceedAfterMinimumDuration(this::proceedToLogin);
+            } else {
+                showNetworkError();
+            }
         }
     }
 
@@ -136,19 +175,10 @@ public class SplashActivity extends AppCompatActivity {
         finish();
     }
 
-    private void proceedToErrorActivity(String error) {
-        Intent intent = new Intent(this, ErrorActivity.class);
-        intent.putExtra("error", error);
-        startActivity(intent);
-        finish();
-    }
-
-    private void proceedToUpdateActivity(String downloadUrl, String releaseNotes,
-                                         String checksum, boolean isMandatory) {
+    private void proceedToUpdateActivity(String downloadUrl, String releaseNotes, boolean isMandatory) {
         Intent intent = new Intent(this, UpdateActivity.class);
         intent.putExtra("downloadUrl", downloadUrl);
         intent.putExtra("releaseNotes", releaseNotes);
-        intent.putExtra("checksum", checksum);
         intent.putExtra("isMandatory", isMandatory);
         startActivity(intent);
         finish();
@@ -159,13 +189,15 @@ public class SplashActivity extends AppCompatActivity {
             HttpURLConnection connection = null;
             InputStream input = null;
             FileOutputStream output = null;
+            long startTime = System.currentTimeMillis();
+            long lastUpdateTime = startTime;
+            long lastBytes = 0;
 
             try {
                 URL url = new URL(apkUrl);
                 connection = (HttpURLConnection) url.openConnection();
                 connection.connect();
 
-                // Check for valid response code
                 if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
                     throw new IOException("Server returned HTTP " + connection.getResponseCode());
                 }
@@ -181,23 +213,35 @@ public class SplashActivity extends AppCompatActivity {
                 byte[] buffer = new byte[4096];
                 int count;
                 long total = 0;
-                int fileLength = connection.getContentLength();
+                final int fileLength = connection.getContentLength(); // Make final
 
                 while ((count = input.read(buffer)) != -1) {
                     output.write(buffer, 0, count);
                     total += count;
-                    if (fileLength > 0) {
-                        int progress = (int) (total * 100 / fileLength);
-                        instance.runOnUiThread(() -> callback.onDownloadProgress(progress));
+
+                    // Calculate download speed every second
+                    long currentTime = System.currentTimeMillis();
+                    if (currentTime - lastUpdateTime >= 1000 || total == fileLength) {
+                        final long currentTotal = total; // Create final copy
+                        final long currentFileLength = fileLength; // Create final copy
+                        double speed = (currentTotal - lastBytes) * 1000.0 / (currentTime - lastUpdateTime);
+                        lastBytes = currentTotal;
+                        lastUpdateTime = currentTime;
+
+                        final int progress = fileLength > 0 ? (int) (currentTotal * 100 / currentFileLength) : 0;
+                        final double finalSpeed = speed; // Create final copy
+
+                        instance.runOnUiThread(() -> callback.onDownloadProgress(
+                                progress, currentTotal, currentFileLength, finalSpeed));
                     }
                 }
 
-                instance.downloadedApkFile = apkFile;
                 instance.runOnUiThread(() -> callback.onDownloadComplete(apkFile));
 
             } catch (IOException e) {
                 Log.e(TAG, "Download failed", e);
-                instance.runOnUiThread(() -> callback.onDownloadFailed(e.getMessage()));
+                final String error = e.getMessage(); // Create final copy
+                instance.runOnUiThread(() -> callback.onDownloadFailed(error));
             } finally {
                 try {
                     if (output != null) output.close();
@@ -206,37 +250,6 @@ public class SplashActivity extends AppCompatActivity {
                 } catch (IOException ignored) {}
             }
         }).start();
-    }
-
-    public static boolean verifyApkChecksum(File apkFile, String expectedChecksum) {
-        if (apkFile == null || !apkFile.exists() || expectedChecksum == null) {
-            return false;
-        }
-
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            InputStream input = new java.io.FileInputStream(apkFile);
-            byte[] buffer = new byte[8192];
-            int bytesRead;
-
-            while ((bytesRead = input.read(buffer)) != -1) {
-                digest.update(buffer, 0, bytesRead);
-            }
-
-            byte[] hash = digest.digest();
-            StringBuilder hexString = new StringBuilder();
-
-            for (byte b : hash) {
-                String hex = Integer.toHexString(0xff & b);
-                if (hex.length() == 1) hexString.append('0');
-                hexString.append(hex);
-            }
-
-            return hexString.toString().equals(expectedChecksum.toLowerCase(Locale.US));
-        } catch (Exception e) {
-            Log.e(TAG, "Checksum verification failed", e);
-            return false;
-        }
     }
 
     public static void installApk(File apkFile) {
@@ -251,27 +264,36 @@ public class SplashActivity extends AppCompatActivity {
                 installIntent.setData(apkUri);
                 installIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 installIntent.putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true);
-                installIntent.putExtra(Intent.EXTRA_RETURN_RESULT, true);
 
-                instance.startActivity(installIntent);
+                instance.startActivityForResult(installIntent, 1001);
 
-                // Schedule file cleanup after 60 seconds
-                new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                    if (apkFile.exists()) {
-                        apkFile.delete();
-                    }
-                }, 60000);
             } catch (Exception e) {
                 Toast.makeText(instance, "Installation failed: " + e.getMessage(),
                         Toast.LENGTH_SHORT).show();
+                // Delete file if installation fails
+                if (apkFile.exists()) {
+                    apkFile.delete();
+                }
             }
         } else {
             Toast.makeText(instance, "APK file not found", Toast.LENGTH_SHORT).show();
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1001) {
+            // After installation attempt, delete the file
+            File apkFile = new File(getExternalFilesDir(null), "update.apk");
+            if (apkFile.exists()) {
+                apkFile.delete();
+            }
+        }
+    }
+
     public interface DownloadCallback {
-        void onDownloadProgress(int progress);
+        void onDownloadProgress(int progress, long downloadedBytes, long totalBytes, double speed);
         void onDownloadComplete(File apkFile);
         void onDownloadFailed(String error);
     }
