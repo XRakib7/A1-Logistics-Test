@@ -8,14 +8,14 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:67498477338:android:a5e420f5b5a53e0fa10ea3",
+        "mobilesdk_app_id": "1:67498477338:android:fad462b2a9e05ed2a10ea3",
         "android_client_info": {
           "package_name": "com.example.a1logisticstest1"
         }
       },
       "oauth_client": [
         {
-          "client_id": "67498477338-ffsecngi9he2lueqafn0oc0rofbtm0g6.apps.googleusercontent.com",
+          "client_id": "67498477338-qu2jpc431iv1ajlijbm9kh0tiv7t830a.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
