@@ -20,6 +20,7 @@ public class UpdateActivity extends AppCompatActivity implements SplashActivity.
     private Button downloadButton;
     private Button btn_settings;
     private Button installButton;
+    private Button cancelButton;
     private TextView statusText;
     private TextView progressText;
     private TextView instalinstruction;
@@ -38,6 +39,7 @@ public class UpdateActivity extends AppCompatActivity implements SplashActivity.
         progressBar = findViewById(R.id.progressBar);
         circularProgress = findViewById(R.id.circularProgress);
         downloadButton = findViewById(R.id.downloadButton);
+        cancelButton = findViewById(R.id.cancelButton);
         btn_settings = findViewById(R.id.btn_settings);
         installButton = findViewById(R.id.installButton);
         statusText = findViewById(R.id.statusText);
@@ -68,18 +70,9 @@ public class UpdateActivity extends AppCompatActivity implements SplashActivity.
     }
 
     private void setupUI(String releaseNotes) {
-        if (isMandatory) {
-            updateCard.setCardBackgroundColor(ContextCompat.getColor(this, R.color.white));
-            downloadButton.setText("Download Now");
-            findViewById(R.id.cancelButton).setVisibility(View.VISIBLE);
-            findViewById(R.id.cancelButton).setOnClickListener(v -> finish());
-        } else {
-            updateCard.setCardBackgroundColor(ContextCompat.getColor(this, R.color.white));
-            downloadButton.setText("Download Update");
-            findViewById(R.id.cancelButton).setVisibility(View.VISIBLE);
-            findViewById(R.id.cancelButton).setOnClickListener(v -> finish());
-        }
-
+        downloadButton.setText(isMandatory ? "Download Now" : "Download Update");
+        cancelButton.setVisibility(View.VISIBLE);
+        cancelButton.setOnClickListener(v -> finish());
         releaseNotesText.setText(releaseNotes != null ? releaseNotes : "No release notes available");
         installButton.setEnabled(false);
         progressBar.setVisibility(View.GONE);
@@ -87,6 +80,7 @@ public class UpdateActivity extends AppCompatActivity implements SplashActivity.
         progressText.setVisibility(View.GONE);
         downloadStatsText.setVisibility(View.GONE);
     }
+
 
     private void startDownload() {
         downloadButton.setEnabled(false);
@@ -113,10 +107,9 @@ public class UpdateActivity extends AppCompatActivity implements SplashActivity.
             sizeInfo = formatFileSize(downloadedBytes);
         }
 
-        // Format speed
-        String speedInfo = formatSpeed(speed);
+        String speedInfo = formatSpeed(speed).replace("/s", "") + "/s";
 
-        downloadStatsText.setText(String.format("%s • %s/s", sizeInfo, speedInfo));
+        downloadStatsText.setText(String.format("%s\n%s", speedInfo, sizeInfo));
         installButton.setVisibility(View.GONE);
     }
 

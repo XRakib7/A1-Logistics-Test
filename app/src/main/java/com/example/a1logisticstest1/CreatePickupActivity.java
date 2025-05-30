@@ -1,10 +1,16 @@
 package com.example.a1logisticstest1;
 
+import static android.content.ContentValues.TAG;
+
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
@@ -25,7 +31,8 @@ public class CreatePickupActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private String merchantId, businessName, pickupLocation;
     private EditText customerNameEditText, customerNumberEditText,
-            deliveryLocationEditText, codPriceEditText,  packageDetailsEditText, weightEditText, pickupLocationEditText;
+            deliveryLocationEditText, codPriceEditText, packageValueEditText,
+            itemQuantityEditText, packageDetailsEditText, weightEditText, pickupLocationEditText;
     private Button submitButton;
     private UIBlocker uiBlocker;
 
@@ -42,6 +49,8 @@ public class CreatePickupActivity extends AppCompatActivity {
         customerNumberEditText = findViewById(R.id.customerNumberEditText);
         deliveryLocationEditText = findViewById(R.id.deliveryLocationEditText);
         codPriceEditText = findViewById(R.id.codPriceEditText);
+        packageValueEditText = findViewById(R.id.packageValueEditText);
+        itemQuantityEditText = findViewById(R.id.itemQuantityEditText);
         packageDetailsEditText = findViewById(R.id.packageDetailsEditText);
         weightEditText = findViewById(R.id.weightEditText);
         pickupLocationEditText = findViewById(R.id.pickupLocationEditText);
@@ -75,11 +84,14 @@ public class CreatePickupActivity extends AppCompatActivity {
         String customerNumber = customerNumberEditText.getText().toString().trim();
         String deliveryLocation = deliveryLocationEditText.getText().toString().trim();
         String codPrice = codPriceEditText.getText().toString().trim();
+        String packageValue = packageValueEditText.getText().toString().trim();
+        String itemQuantity = itemQuantityEditText.getText().toString().trim();
         String packageDetails = packageDetailsEditText.getText().toString().trim();
         String packageWeight = weightEditText.getText().toString().trim();
         String pickupLocation = pickupLocationEditText.getText().toString().trim();
 
-        if (validateInputs(customerName, customerNumber, deliveryLocation, codPrice, packageWeight, packageDetails, pickupLocation)) {
+        if (validateInputs(customerName, customerNumber, deliveryLocation, codPrice,
+                packageValue, itemQuantity, packageWeight, packageDetails, pickupLocation)) {
             uiBlocker.blockUI("Creating pickup request...");
             submitButton.setEnabled(false);
 
@@ -95,6 +107,8 @@ public class CreatePickupActivity extends AppCompatActivity {
                     pickupRequest.put("customerNumber", customerNumber);
                     pickupRequest.put("deliveryLocation", deliveryLocation);
                     pickupRequest.put("codPrice", Double.parseDouble(codPrice));
+                    pickupRequest.put("packageValue", packageValue.isEmpty() ? 0 : Double.parseDouble(packageValue));
+                    pickupRequest.put("itemQuantity", itemQuantity.isEmpty() ? 1 : Integer.parseInt(itemQuantity));
                     pickupRequest.put("packageDetails", packageDetails);
                     pickupRequest.put("packageWeight", Double.parseDouble(packageWeight));
                     pickupRequest.put("pickupLocation", pickupLocation);
@@ -115,28 +129,63 @@ public class CreatePickupActivity extends AppCompatActivity {
                     db.collection("PickupRequests").document(orderId)
                             .set(pickupRequest)
                             .addOnCompleteListener(task -> {
+                                uiBlocker.unblockUI();
                                 if (task.isSuccessful()) {
-                                    uiBlocker.showSuccess("Pickup created successfully!", () -> {
-                                        finish();
-                                    });
+                                    showConfirmationDialog(orderId, customerName, customerNumber,
+                                            deliveryLocation, pickupLocation, codPrice);
                                 } else {
-                                    uiBlocker.showError("Failed to create pickup");
                                     submitButton.setEnabled(true);
+                                    uiBlocker.showError("Failed to create pickup");
                                 }
                             });
                 }
 
                 @Override
                 public void onFailure(Exception e) {
-                    uiBlocker.showError("Failed to generate order ID");
+                    uiBlocker.unblockUI();
                     submitButton.setEnabled(true);
+                    uiBlocker.showError("Failed to generate order ID");
                 }
             });
         }
     }
+    private void showConfirmationDialog(String orderId, String customerName,
+                                        String customerNumber, String deliveryLocation,
+                                        String pickupLocation, String codPrice) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_order_confirmation, null);
+        builder.setView(dialogView);
+        AlertDialog dialog = builder.create();
+        dialog.setCancelable(false);
+
+        // Set the dialog data
+        TextView tvOrderId = dialogView.findViewById(R.id.tvOrderId);
+        TextView tvCustomerName = dialogView.findViewById(R.id.tvCustomerName);
+        TextView tvCustomerPhone = dialogView.findViewById(R.id.tvCustomerPhone);
+        TextView tvDeliveryLocation = dialogView.findViewById(R.id.tvDeliveryLocation);
+        TextView tvPickupLocation = dialogView.findViewById(R.id.tvPickupLocation);
+        TextView tvCodAmount = dialogView.findViewById(R.id.tvCodAmount);
+        Button btnDone = dialogView.findViewById(R.id.btnDone);
+
+        tvOrderId.setText(String.format("Order ID: %s", orderId));
+        tvCustomerName.setText(String.format("Customer: %s", customerName));
+        tvCustomerPhone.setText(String.format("Phone: %s", customerNumber));
+        tvDeliveryLocation.setText(String.format("Delivery To: %s", deliveryLocation));
+        tvPickupLocation.setText(String.format("Pickup From: %s", pickupLocation));
+        tvCodAmount.setText(String.format("COD Amount: ৳%s", codPrice));
+
+        btnDone.setOnClickListener(v -> {
+            dialog.dismiss();
+            finish();
+        });
+
+        dialog.show();
+    }
 
     private boolean validateInputs(String customerName, String customerNumber,
-                                   String deliveryLocation, String codPrice,String packageWeight, String packageDetails, String pickupLocation) {
+                                   String deliveryLocation, String codPrice, String packageValue,
+                                   String itemQuantity, String packageWeight,
+                                   String packageDetails, String pickupLocation) {
         if (customerName.isEmpty()) {
             customerNameEditText.setError("Customer name is required");
             return false;
@@ -161,6 +210,7 @@ public class CreatePickupActivity extends AppCompatActivity {
             packageDetailsEditText.setError("Package details are required");
             return false;
         }
+
         if (packageWeight.isEmpty()) {
             weightEditText.setError("Package weight is required");
             return false;
@@ -205,6 +255,7 @@ public class CreatePickupActivity extends AppCompatActivity {
             }
         });
     }
+
     @Override
     protected void onDestroy() {
         if (uiBlocker != null) {

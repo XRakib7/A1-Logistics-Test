@@ -1,5 +1,6 @@
 package com.example.a1logisticstest1;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -18,6 +19,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.Manifest;
 
 import com.google.firebase.Timestamp;
+
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Comparator;
@@ -53,7 +56,12 @@ public class PackageDetailActivity extends BaseActivity {
             }
         }
     }
-
+    public static void start(AppCompatActivity activity, Map<String, Object> packageData, boolean isAdmin) {
+        Intent intent = new Intent(activity, PackageDetailActivity.class);
+        intent.putExtra("packageData", (Serializable) packageData);
+        intent.putExtra("isAdmin", isAdmin);
+        activity.startActivity(intent);
+    }
     private void initializeViews(Map<String, Object> packageData) {
         TextView orderIdText = findViewById(R.id.orderIdTextView);
         TextView customerNameText = findViewById(R.id.customerNameTextView);
@@ -62,12 +70,15 @@ public class PackageDetailActivity extends BaseActivity {
         TextView codPriceText = findViewById(R.id.codPriceTextView);
         TextView packageDetailsText = findViewById(R.id.packageDetailsText);
         TextView packageWeightText = findViewById(R.id.packageWeightText);
+        TextView itemQuantityText = findViewById(R.id.itemQuantityText);
+        TextView packageValueText = findViewById(R.id.packageValueText);
         TextView pickupLocationText = findViewById(R.id.pickupLocationText);
         TextView merchantIdText = findViewById(R.id.merchantIdText);
         TextView merchantNameText = findViewById(R.id.merchantNameText);
         TextView statusText = findViewById(R.id.statusTextView);
         TextView createdDateText = findViewById(R.id.createdDateText);
         TextView lastUpdateText = findViewById(R.id.lastUpdateText);
+
 
         setTextSafe(orderIdText, packageData.get("orderId"));
         setTextSafe(customerNameText, packageData.get("customerName"));
@@ -76,6 +87,8 @@ public class PackageDetailActivity extends BaseActivity {
         setTextSafe(codPriceText, "BDT " + packageData.get("codPrice"));
         setTextSafe(packageDetailsText, packageData.get("packageDetails"));
         setTextSafe(packageWeightText, packageData.get("packageWeight") + " KG");
+        setTextSafe(itemQuantityText, packageData.get("itemQuantity"));
+        setTextSafe(packageValueText, "BDT " + packageData.get("packageValue"));
         setTextSafe(pickupLocationText, packageData.get("pickupLocation"));
         setTextSafe(merchantNameText, packageData.get("merchantName"));
         setTextSafe(merchantIdText, packageData.get("merchantId"));
@@ -98,7 +111,8 @@ public class PackageDetailActivity extends BaseActivity {
 
         setSelectable(orderIdText, customerNameText, customerNumberText, deliveryLocationText,
                 codPriceText, packageDetailsText, packageWeightText, pickupLocationText,
-                merchantIdText, merchantNameText, statusText, createdDateText, lastUpdateText);
+                merchantIdText, merchantNameText, statusText, createdDateText, lastUpdateText,
+                itemQuantityText, packageValueText);
     }
 
     private void displayStatusHistory(List<Map<String, Object>> history) {

@@ -31,4 +31,13 @@
     <string name="network_error_title">No Internet Connection</string>
     <string name="network_error_description">Please check your network connection and try again</string>
     <string name="instructiontext">IF any error occures please click \"download now\" after download complete click \"Install now\"</string>
+    <string name="descriptiontext"><![CDATA[Fast, Reliable & Secure]]></string>
+    <string name="default_web_client_id">Your_Web_Client_ID_From_Google_Cloud_Console</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_track">Track</string>
+    <string name="nav_services">Services</string>
+    <string name="nav_account">Account</string>
+    <!-- Services Activity -->
+    <string name="services_title">Our Services</string>
+    <string name="contact_button">Contact Us</string>
 </resources>

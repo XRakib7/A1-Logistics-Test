@@ -1,5 +1,11 @@
 package com.example.a1logisticstest1;
 
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,12 +46,30 @@ public class PackageAdapter extends RecyclerView.Adapter<PackageAdapter.PackageV
         Map<String, Object> packageData = packages.get(position);
 
         try {
-            holder.orderIdText.setText(getSafeString(packageData, "orderId"));
-            holder.customerNameText.setText(getSafeString(packageData, "customerName"));
-            holder.customerNumberText.setText(getSafeString(packageData, "customerNumber"));
-            holder.deliveryLocationText.setText(getSafeString(packageData, "deliveryLocation"));
-            holder.codPriceText.setText(getSafeString(packageData, "codPrice"));
-            holder.statusText.setText(getSafeString(packageData, "status"));
+            String orderId = getSafeString(packageData, "orderId");
+            String customerName = getSafeString(packageData, "customerName");
+            String customerNumber = getSafeString(packageData, "customerNumber");
+            String deliveryLocation = getSafeString(packageData, "deliveryLocation");
+            String codPrice = getSafeString(packageData, "codPrice");
+            String status = getSafeString(packageData, "status");
+
+            // Highlight search results if there's a query
+            if (listener instanceof AllPackagesActivity) {
+                String query = ((AllPackagesActivity) listener).getCurrentSearchQuery();
+                highlightText(holder.orderIdText, orderId, query);
+                highlightText(holder.customerNameText, customerName, query);
+                highlightText(holder.customerNumberText, customerNumber, query);
+                highlightText(holder.deliveryLocationText, deliveryLocation, query);
+                highlightText(holder.codPriceText, codPrice, query);
+                highlightText(holder.statusText, status, query);
+            } else {
+                holder.orderIdText.setText(orderId);
+                holder.customerNameText.setText(customerName);
+                holder.customerNumberText.setText(customerNumber);
+                holder.deliveryLocationText.setText(deliveryLocation);
+                holder.codPriceText.setText(codPrice);
+                holder.statusText.setText(status);
+            }
 
             // Format and display dates
             Timestamp createdDate = (Timestamp) packageData.get("createdDate");
@@ -71,7 +95,35 @@ public class PackageAdapter extends RecyclerView.Adapter<PackageAdapter.PackageV
             Log.e(TAG, "Error binding package data", e);
         }
     }
+    public void highlightText(TextView textView, String text, String query) {
+        if (text == null || query == null || query.isEmpty()) {
+            textView.setText(text);
+            return;
+        }
 
+        SpannableString spannable = new SpannableString(text);
+        String lowerText = text.toLowerCase(Locale.getDefault());
+        String lowerQuery = query.toLowerCase(Locale.getDefault());
+        int startPos = lowerText.indexOf(lowerQuery);
+
+        if (startPos != -1) {
+            int endPos = startPos + query.length();
+            spannable.setSpan(
+                    new ForegroundColorSpan(Color.YELLOW),
+                    startPos,
+                    endPos,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            );
+            spannable.setSpan(
+                    new StyleSpan(Typeface.BOLD),
+                    startPos,
+                    endPos,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            );
+        }
+
+        textView.setText(spannable);
+    }
     private String getSafeString(Map<String, Object> map, String key) {
         if (map == null || !map.containsKey(key) || map.get(key) == null) {
             return "N/A";
@@ -107,4 +159,5 @@ public class PackageAdapter extends RecyclerView.Adapter<PackageAdapter.PackageV
             });
         }
     }
+
 }

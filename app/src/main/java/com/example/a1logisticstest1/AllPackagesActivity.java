@@ -1,6 +1,8 @@
 package com.example.a1logisticstest1;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -11,6 +13,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
 
 import android.widget.RadioGroup;
@@ -18,6 +22,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.textfield.TextInputEditText;
@@ -40,6 +46,7 @@ import com.airbnb.lottie.LottieAnimationView;
 public class AllPackagesActivity extends BaseActivity {
 
     private static final String TAG = "AllPackagesActivity";
+    private static final int STORAGE_PERMISSION_CODE = 100;
     private RecyclerView recyclerView;
     private LottieAnimationView progressLoader;
     private PackageAdapter adapter;
@@ -55,7 +62,7 @@ public class AllPackagesActivity extends BaseActivity {
     private String packageType = "all"; // New: "active", "delivered", "returned", "all"
 
     private SearchView searchView;
-    // Add these constants at the top of the class
+    private String currentSearchQuery = "";
     private static final String SORT_CREATED_NEWEST = "created_desc";
     private static final String SORT_CREATED_OLDEST = "created_asc";
     private static final String SORT_UPDATED_NEWEST = "updated_desc";
@@ -309,7 +316,8 @@ public class AllPackagesActivity extends BaseActivity {
                             includeRecord = false;
                         }
 
-                        if (includeRecord) {
+                        // Apply search filter if there's a query
+                        if (includeRecord && (currentSearchQuery.isEmpty() || matchesSearchQuery(packageData, currentSearchQuery))) {
                             packagesList.add(packageData);
                         }
                     }
@@ -325,6 +333,36 @@ public class AllPackagesActivity extends BaseActivity {
                 handleLoadError(task.getException());
             }
         });
+    }
+
+    // Add this new method to check if package matches search query
+    private boolean matchesSearchQuery(Map<String, Object> packageData, String query) {
+        if (query.isEmpty()) return true;
+
+        // Check all searchable fields
+        String[] searchFields = {
+                "orderId",
+                "customerName",
+                "customerNumber",
+                "deliveryLocation",
+                "codPrice",
+                "status",
+                "merchantName",
+                "pickupLocation",
+                "packageDetails"
+        };
+
+        for (String field : searchFields) {
+            Object value = packageData.get(field);
+            if (value != null) {
+                String stringValue = value.toString().toLowerCase(Locale.getDefault());
+                if (stringValue.contains(query)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private void handleLoadError(Exception exception) {
@@ -533,9 +571,30 @@ public class AllPackagesActivity extends BaseActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.filter_menu, menu);
+
+        // Setup search view
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        searchView = (SearchView) searchItem.getActionView();
+        searchView.setQueryHint("Search packages...");
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                currentSearchQuery = query.toLowerCase(Locale.getDefault());
+                loadPackages();
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                currentSearchQuery = newText.toLowerCase(Locale.getDefault());
+                loadPackages();
+                return false;
+            }
+        });
+
         return true;
     }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_filter) {
@@ -546,10 +605,40 @@ public class AllPackagesActivity extends BaseActivity {
                 Toast.makeText(this, "No packages to download", Toast.LENGTH_SHORT).show();
             } else {
                 Log.d(TAG, "Download button clicked, packages count: " + packagesList.size());
-                DownloadUtils.downloadPackageList(this, packagesList, isAdmin()); // Changed this line
+                // Check and request permission before downloading
+                checkAndRequestStoragePermission();
             }
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void checkAndRequestStoragePermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED) {
+            // Permission already granted, proceed with download
+            DownloadUtils.downloadPackageList(this, packagesList, isAdmin());
+        } else {
+            // Request the permission
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    STORAGE_PERMISSION_CODE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == STORAGE_PERMISSION_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, proceed with download
+                DownloadUtils.downloadPackageList(this, packagesList, isAdmin());
+            } else {
+                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+    public String getCurrentSearchQuery() {
+        return currentSearchQuery;
     }
 }

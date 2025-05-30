@@ -13,16 +13,16 @@ android {
         minSdk = 28
         compileSdk = 35
         targetSdk = 35
-        versionCode = 10
-        versionName = "1.1.0.10"
+        versionCode = 12
+        versionName = "1.2.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     //git add .
-    //git commit -m "Prepare release 1.1.0.10"
+    //git commit -m "Prepare release 1.2.0.0"
     //git push origin main
-    //git tag -a v1.1.0.10 -m "Release 1.1.0.10"
-    //git push origin v1.1.0.10
-    // gh release create v1.1.0.10 "app\release\app-release.apk" --title "Version 1.1.0.10" --notes "Initial release with basic functionality"
+    //git tag -a v1.2.0.0 -m "Release 1.2.0.0"
+    //git push origin v1.2.0.0
+    // gh release create v1.2.0.0 "app\release\app-release.apk" --title "Version 1.2.0.0" --notes "Initial release with basic functionality"
 
     buildTypes {
         release {
@@ -55,6 +55,9 @@ dependencies {
     implementation("com.google.android.gms:play-services-auth:21.3.0")
     // https://mvnrepository.com/artifact/com.google.android.gms/play-services-auth-api-phone
     implementation("com.google.android.gms:play-services-auth-api-phone:18.2.0")
+    // https://mvnrepository.com/artifact/androidx.gridlayout/gridlayout
+    implementation("androidx.gridlayout:gridlayout:1.1.0")
+
     implementation("com.google.android.material:material:1.6.0")// or higher
     implementation("com.google.firebase:firebase-storage:20.3.0")  // For APK hosting
     implementation("com.google.firebase:firebase-appdistribution:16.0.0-beta10")  // For update checks
@@ -70,6 +73,8 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.messaging)
     implementation(libs.firebase.functions)
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.analytics)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

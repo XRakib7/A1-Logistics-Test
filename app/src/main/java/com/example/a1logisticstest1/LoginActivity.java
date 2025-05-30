@@ -1,30 +1,17 @@
 package com.example.a1logisticstest1;
 
 import static android.content.ContentValues.TAG;
-
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
-import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.airbnb.lottie.LottieAnimationView;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.auth.AuthResult;
+
 import com.google.firebase.auth.FirebaseAuth;
+
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -32,14 +19,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 // Add these imports
 import android.content.SharedPreferences;
 import com.google.gson.Gson;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
-import android.Manifest;
-import com.example.a1logisticstest1.UIBlocker;
+
 /*
  * This file is part of [A1 Logistics 2025]
  * Copyright (c) [RAKIB]
@@ -50,16 +32,13 @@ import com.example.a1logisticstest1.UIBlocker;
 public class LoginActivity extends AppCompatActivity {
     private static final String PREFS_NAME = "A1LogisticsPrefs";
     private static final String USER_KEY = "currentUser";
-
-
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
-
     private TextInputEditText emailEditText, passwordEditText;
     private Button loginButton;
     private TextView signupRedirectText;
-    private ActivityResultLauncher<String> storagePermissionLauncher;
     private UIBlocker uiBlocker;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,20 +60,8 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(new Intent(LoginActivity.this, SignupActivity.class));
             finish();
         });
-        storagePermissionLauncher = registerForActivityResult(
-                new ActivityResultContracts.RequestPermission(),
-                isGranted -> {
-                    if (isGranted) {
-                        Toast.makeText(this, "Storage permission granted!", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(this, "Storage permission denied!", Toast.LENGTH_SHORT).show();
-                        // Optional: Show rationale or disable features
-                    }
-                }
-        );
-
         checkExistingLogin();
-        checkAndRequestStoragePermission();
+
     }
 
     private void attemptLogin() {
@@ -174,27 +141,6 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 });
     }
-    private void updateLastLogin(DocumentReference userRef) {
-        Map<String, Object> updates = new HashMap<>();
-        updates.put("lastLogin", FieldValue.serverTimestamp());
-
-        userRef.update(updates)
-                .addOnFailureListener(e -> Log.e(TAG, "Error updating last login", e));
-    }
-
-    private void saveUserToPrefs(String role, String uid, String name) {
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-
-        Map<String, String> userData = new HashMap<>();
-        userData.put("role", role);
-        userData.put("uid", uid);
-        userData.put("name", name);
-        userData.put("email", emailEditText.getText().toString().trim());
-
-        editor.putString(USER_KEY, new Gson().toJson(userData));
-        editor.apply();
-    }
     // Add this method to check if user is already logged in
     private void checkExistingLogin() {
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
@@ -227,30 +173,25 @@ public class LoginActivity extends AppCompatActivity {
             });
         }
     }
-    // Step 4: Check if permission is needed
-    private boolean needsStoragePermission() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-                checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED;
+    private void updateLastLogin(DocumentReference userRef) {
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("lastLogin", FieldValue.serverTimestamp());
+
+        userRef.update(updates)
+                .addOnFailureListener(e -> Log.e(TAG, "Error updating last login", e));
     }
 
-    // Step 5: Request permission with rationale (optional)
-    private void checkAndRequestStoragePermission() {
-        if (needsStoragePermission()) {
-            if (shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                // Explain why permission is needed
-                new AlertDialog.Builder(this)
-                        .setTitle("Storage Permission Needed")
-                        .setMessage("This app needs access to your storage to save/load files.")
-                        .setPositiveButton("OK", (dialog, which) -> {
-                            storagePermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
-                        })
-                        .setNegativeButton("Cancel", null)
-                        .show();
-            } else {
-                // Directly request permission
-                storagePermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
-            }
-        }
-    }
+    private void saveUserToPrefs(String role, String uid, String name) {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
 
+        Map<String, String> userData = new HashMap<>();
+        userData.put("role", role);
+        userData.put("uid", uid);
+        userData.put("name", name);
+        userData.put("email", emailEditText.getText().toString().trim());
+
+        editor.putString(USER_KEY, new Gson().toJson(userData));
+        editor.apply();
+    }
 }

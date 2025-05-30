@@ -19,10 +19,13 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="50dp"
             android:text="@string/app_name"
-            android:textColor="@color/gold_dark"
+            android:textColor="@color/gold_primary"
             android:textSize="36sp"
             android:textStyle="bold"
-            />
+            android:shadowColor="@color/gold_dark"
+            android:shadowDx="0"
+            android:shadowDy="4"
+            android:shadowRadius="12"/>
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/updateCard"
@@ -35,6 +38,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/bg_gradient_premium"
                 android:orientation="vertical"
                 android:padding="24dp">
 
@@ -44,7 +48,7 @@
                     app:tint="@color/gold_primary"
                     android:layout_gravity="center_horizontal"
                     android:src="@drawable/ic_download"
-                  />
+                    />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -74,6 +78,7 @@
                     android:gravity="center"
                     android:textColor="@color/dark_mustard"
                     android:textSize="24sp"
+                    android:singleLine="false"
                     android:visibility="gone"/>
 
                 <!-- New download stats TextView -->
@@ -97,7 +102,7 @@
                     android:max="100"
                     android:progress="0"
                     android:visibility="gone"
-                    app:indicatorColor="@color/gold_light"
+                    app:indicatorColor="@color/coral"
                     app:trackColor="@color/gray_light"/>
 
                 <ProgressBar
@@ -128,6 +133,8 @@
                     android:backgroundTint="@color/colorPrimary"
                     android:text="@string/download_update"
                     android:textColor="@color/gray_light"
+                    app:icon= "@drawable/ic_download"
+                    app:iconTint="@color/gray_light"
                     android:textAllCaps="false"
                     android:textSize="16sp"/>
 
@@ -171,9 +178,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:layout_marginTop="8dp"
-                    android:background="@color/light_gray"
                     android:text="Cancel"
-                    android:textColor="@color/mandatory_update"
                     android:textAllCaps="false"
                     android:textSize="16sp"
                     android:visibility="gone"/>

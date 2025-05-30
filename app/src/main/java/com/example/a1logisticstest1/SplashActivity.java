@@ -1,6 +1,7 @@
 package com.example.a1logisticstest1;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -20,6 +21,7 @@ import androidx.core.content.FileProvider;
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.gson.Gson;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -27,16 +29,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Map;
 
 public class SplashActivity extends AppCompatActivity {
     private static final String TAG = "SplashActivity";
     private static final String VERSION_COLLECTION = "app_updates";
     private static final String VERSION_DOCUMENT = "latest_version";
-    private static final long MIN_SPLASH_DURATION = 2000;
     private static final int MAX_RETRY_COUNT = 3;
 
     private FirebaseFirestore db;
-    private long startTime;
     private static SplashActivity instance;
     private int retryCount = 0;
     private RelativeLayout mainContent;
@@ -44,12 +45,13 @@ public class SplashActivity extends AppCompatActivity {
     private LottieAnimationView loadingAnimation;
     private Button btnRetry, btnSettings, btnExit;
     private TextView errorMessage, errorDescription;
+    private static final String PREFS_NAME = "A1LogisticsPrefs";
+    private static final String USER_KEY = "currentUser";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
         instance = this;
-        startTime = System.currentTimeMillis();
 
         mainContent = findViewById(R.id.main_content);
         errorContainer = findViewById(R.id.error_container);
@@ -60,22 +62,17 @@ public class SplashActivity extends AppCompatActivity {
         errorMessage = findViewById(R.id.error_message);
         errorDescription = findViewById(R.id.error_description);
 
-        instance = this;
-        startTime = System.currentTimeMillis();
-
         // Set up button listeners
         btnRetry.setOnClickListener(v -> checkNetworkAndProceed());
         btnSettings.setOnClickListener(v -> openNetworkSettings());
         btnExit.setOnClickListener(v -> finishAffinity());
 
         checkNetworkAndProceed();
-
-        db = FirebaseFirestore.getInstance();
-        checkForUpdates();
     }
+
     private void checkNetworkAndProceed() {
         if (isNetworkAvailable()) {
-            // Show main content and hide error layout
+            // Online: Show loading, check for updates
             mainContent.setVisibility(View.VISIBLE);
             errorContainer.setVisibility(View.GONE);
             loadingAnimation.playAnimation();
@@ -83,26 +80,22 @@ public class SplashActivity extends AppCompatActivity {
             db = FirebaseFirestore.getInstance();
             checkForUpdates();
         } else {
+            // Offline: Show error (stays until retry/exit)
             showNetworkError();
-            // Reset retry count when network is unavailable
-            retryCount = 0;
         }
     }
 
     private void showNetworkError() {
-        // Hide main content and show error layout
         mainContent.setVisibility(View.GONE);
         errorContainer.setVisibility(View.VISIBLE);
         loadingAnimation.pauseAnimation();
 
-        // Update error messages
         errorMessage.setText(R.string.network_error_title);
         errorDescription.setText(R.string.network_error_description);
     }
 
     private void openNetworkSettings() {
-        Intent intent = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
-        startActivity(intent);
+        startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
     }
 
     private boolean isNetworkAvailable() {
@@ -142,7 +135,7 @@ public class SplashActivity extends AppCompatActivity {
             if (latestVersionCode > currentVersionCode) {
                 proceedToUpdateActivity(downloadUrl, releaseNotes, forceUpdate);
             } else {
-                proceedAfterMinimumDuration(this::proceedToLogin);
+                proceedToMain(); // No delay, proceed immediately
             }
         } catch (Exception e) {
             handleVersionCheckError("Error parsing version data: " + e.getMessage());
@@ -151,30 +144,41 @@ public class SplashActivity extends AppCompatActivity {
 
     private void handleVersionCheckError(String error) {
         Log.e(TAG, error);
-        if (retryCount < MAX_RETRY_COUNT) {
+        if (retryCount < MAX_RETRY_COUNT && isNetworkAvailable()) {
             retryCount++;
             new Handler(Looper.getMainLooper()).postDelayed(this::checkForUpdates, 2000);
         } else {
-            // Only proceed if we have network, otherwise show error
             if (isNetworkAvailable()) {
-                proceedAfterMinimumDuration(this::proceedToLogin);
+                proceedToMain(); // Proceed if online (even if update check failed)
             } else {
-                showNetworkError();
+                showNetworkError(); // Stay on error if offline
             }
         }
     }
 
-    private void proceedAfterMinimumDuration(Runnable action) {
-        long elapsedTime = System.currentTimeMillis() - startTime;
-        long remainingTime = MIN_SPLASH_DURATION - elapsedTime;
-        new Handler(Looper.getMainLooper()).postDelayed(action, Math.max(remainingTime, 0));
-    }
+    private void proceedToMain() {
+        if (isUserLoggedIn()) {
+            // User is logged in - proceed to appropriate dashboard
+            SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+            String userJson = prefs.getString(USER_KEY, null);
+            Map<String, String> userData = new Gson().fromJson(userJson, Map.class);
+            String role = userData.get("role");
 
-    private void proceedToLogin() {
-        startActivity(new Intent(this, LoginActivity.class));
+            Intent intent = "Admin".equals(role) ?
+                    new Intent(this, AdminDashboardActivity.class) :
+                    new Intent(this, MerchantDashboardActivity.class);
+
+            startActivity(intent);
+        } else {
+            // User is not logged in - go to main activity
+            startActivity(new Intent(this, MainActivity.class));
+        }
         finish();
     }
-
+    private boolean isUserLoggedIn() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        return prefs.getString(USER_KEY, null) != null;
+    }
     private void proceedToUpdateActivity(String downloadUrl, String releaseNotes, boolean isMandatory) {
         Intent intent = new Intent(this, UpdateActivity.class);
         intent.putExtra("downloadUrl", downloadUrl);
@@ -297,4 +301,5 @@ public class SplashActivity extends AppCompatActivity {
         void onDownloadComplete(File apkFile);
         void onDownloadFailed(String error);
     }
+
 }
