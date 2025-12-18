@@ -4,7 +4,7 @@
 
 ## License
 
-This project is licensed for **personal and non-commercial use only**. If you'd like to use it for business or commercial purposes, please [contact me](email :hackbet07@gmail.com).
+This project is licensed for **personal and non-commercial use only**. If you'd like to use it for business or commercial purposes, please [contact me](phone: +8801580350962).
 
 Full license: [LICENSE](https://github.com/XRakib7/A1-Logistics-Test/blob/main/Licences)
 
